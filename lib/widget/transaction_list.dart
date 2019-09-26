@@ -10,50 +10,83 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-        children: transactions.map((transaction) {
-      return Card(
-        child: Row(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-              decoration: BoxDecoration(
-                  border: Border.all(
-                color: Colors.purple,
-                width: 1,
-              )),
-              child: Text(
-                '৳ ${transaction.amount}',
-                style: TextStyle(
-                  color: Colors.purple,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 19,
-                ),
-              ),
-              padding: EdgeInsets.all(10),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      height: 500,
+      child: transactions.isEmpty
+          ? Column(
               children: <Widget>[
-                Text(
-                  transaction.title,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                Center(
+                  child: Text(
+                    'No expenses are here.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.title,
                   ),
                 ),
-                Text(
-                  DateFormat().format(transaction.dateTime),
-                  style: TextStyle(
-                    color: Colors.grey,
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 200,
+                  child: Image.asset(
+                    'assets/images/waiting.png',
+                    fit: BoxFit.cover,
                   ),
                 ),
               ],
             )
-          ],
-        ),
-      );
-    }).toList());
+          : ListView.builder(
+              itemBuilder: (ctx, index) {
+                return Card(
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        margin:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                          color: Theme.of(context).primaryColor,
+                          width: 0.50,
+                        )),
+                        child: Text(
+                          '৳ ${transactions[index].amount.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 19,
+                          ),
+                        ),
+                        padding: EdgeInsets.all(10),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            // title details
+                            transactions[index].title,
+                            style: Theme.of(context).textTheme.title,
+                          ),
+                          Text(
+                            // title details
+                            transactions[index].notes,
+                            style: TextStyle(
+                              color: Colors.blueGrey,
+                            ),
+                          ),
+                          Text(
+                            // time date details
+                            DateFormat().format(transactions[index].dateTime),
+                            style: TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              },
+              itemCount: transactions.length,
+            ),
+    );
   }
 }

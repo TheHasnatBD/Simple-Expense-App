@@ -1,12 +1,31 @@
 import 'package:flutter/material.dart';
 
-class NewTransaction extends StatelessWidget {
+class NewTransaction extends StatefulWidget {
   final Function addTransactionHandler;
+
+  NewTransaction(this.addTransactionHandler);
+
+  @override
+  _NewTransactionState createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
   final titleEditingController = TextEditingController();
   final noteEditingController = TextEditingController();
   final amountEditingController = TextEditingController();
 
-  NewTransaction(this.addTransactionHandler);
+  void submitTransaction() {
+    final title = titleEditingController.text;
+    final notes = noteEditingController.text;
+    final amount = double.parse(amountEditingController.text);
+
+    if (title.isEmpty || notes.isEmpty || amount <= 0) {
+      return;
+    } else {
+      widget.addTransactionHandler(title, notes, amount);
+      Navigator.of(context).pop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,26 +39,26 @@ class NewTransaction extends StatelessWidget {
             TextField(
               decoration: InputDecoration(labelText: 'Title'),
               controller: titleEditingController,
+              onSubmitted: (_) => submitTransaction,
             ),
             TextField(
               decoration: InputDecoration(labelText: 'Amount'),
               controller: amountEditingController,
+              keyboardType: TextInputType.number,
+              onSubmitted: (_) => submitTransaction(),
             ),
             TextField(
               decoration: InputDecoration(labelText: 'Detail'),
               controller: noteEditingController,
+              onSubmitted: (_) => submitTransaction(),
             ),
             FlatButton(
-                onPressed: () {
-                  addTransactionHandler(
-                    titleEditingController.text,
-                    noteEditingController.text,
-                    double.parse(amountEditingController.text),
-                  );
-                },
+                onPressed: submitTransaction,
                 child: Text(
                   "Add Transcation",
-                  style: TextStyle(color: Colors.purple),
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ))
           ],
         ),
