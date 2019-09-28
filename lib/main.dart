@@ -5,7 +5,15 @@ import './widget/new_transaction.dart';
 import './widget/transaction_list.dart';
 import 'model/transaction.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  /*
+  // forced to portrait mode
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitUp,
+  ]);*/
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -13,14 +21,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My Expenss',
       theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-          accentColor: Colors.deepOrangeAccent,
+          primarySwatch: Colors.blue,
+          accentColor: Colors.blueAccent,
           fontFamily: 'Quicksand',
           textTheme: ThemeData.light().textTheme.copyWith(
-              title: TextStyle(
+                title: TextStyle(
                   fontFamily: 'OpenSans',
                   fontSize: 18,
-                  fontWeight: FontWeight.bold)),
+                  fontWeight: FontWeight.bold,
+                ),
+                button: TextStyle(color: Colors.white),
+              ),
           appBarTheme: AppBarTheme(
               textTheme: ThemeData.light().textTheme.copyWith(
                   title: TextStyle(
@@ -39,7 +50,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   //String titleInput, noteDetailInput, amountInput;
-
+  bool _showChart = false;
   final List<Transaction> _transactionList = [
     /*Transaction(
         id: '1',
@@ -55,18 +66,27 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
-  void _addNewTransaction(String title, String notes, double amount) {
+  void _addNewTransaction(
+      String title, String notes, DateTime selectedDate, double amount) {
     final transaction = Transaction(
         id: DateTime.now().toString(),
         title: title,
         notes: notes,
-        dateTime: DateTime.now(),
+        dateTime: selectedDate,
         amount: amount);
 
     setState(() {
       _transactionList.add(transaction);
     });
   } // _addNewTransaction
+
+  void _deleteTransaction(String id) {
+    setState(() {
+      _transactionList.removeWhere((transaction) {
+        return transaction.id == id;
+      });
+    });
+  }
 
   void addNewTransactionSheet(BuildContext context) {
     showModalBottomSheet(
@@ -82,27 +102,56 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "My Expenses",
-          style: TextStyle(fontFamily: 'Open Sans'),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => addNewTransactionSheet(context),
-          )
-        ],
+    final appBar = AppBar(
+      title: Text(
+        "My Expenses",
+        style: TextStyle(fontFamily: 'Open Sans'),
       ),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => addNewTransactionSheet(context),
+        )
+      ],
+    );
+
+    return Scaffold(
+      appBar: appBar,
       body: SingleChildScrollView(
         padding: EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             // CHART Container
-            Chart(_recentTransactions),
-            TransactionList(_transactionList),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('View chart'),
+                Switch(
+                    value: _showChart,
+                    onChanged: (value) {
+                      setState(() {
+                        _showChart = value;
+                      });
+                    }),
+              ],
+            ),
+            _showChart
+                ? Container(
+                    height: (MediaQuery.of(context).size.height -
+                            appBar.preferredSize.height -
+                            MediaQuery.of(context).padding.top) *
+                        70,
+                    child: Chart(_recentTransactions),
+                  )
+                : Container(
+                    height: (MediaQuery.of(context).size.height -
+                            appBar.preferredSize.height -
+                            MediaQuery.of(context).padding.top) *
+                        0.70,
+                    child:
+                        TransactionList(_transactionList, _deleteTransaction),
+                  ),
           ],
         ),
       ),

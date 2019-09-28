@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NewTransaction extends StatefulWidget {
   final Function addTransactionHandler;
@@ -10,21 +11,47 @@ class NewTransaction extends StatefulWidget {
 }
 
 class _NewTransactionState extends State<NewTransaction> {
-  final titleEditingController = TextEditingController();
-  final noteEditingController = TextEditingController();
-  final amountEditingController = TextEditingController();
+  final _titleEditingController = TextEditingController();
+  final _noteEditingController = TextEditingController();
+  final _amountEditingController = TextEditingController();
+  DateTime _selectedDate;
 
-  void submitTransaction() {
-    final title = titleEditingController.text;
-    final notes = noteEditingController.text;
-    final amount = double.parse(amountEditingController.text);
+  void _submitTransaction() {
+    final title = _titleEditingController.text;
+    final notes = _noteEditingController.text;
+    final amountInput = _amountEditingController.text;
+    if (amountInput.isEmpty) {
+      return;
+    }
+    final amount = double.parse(amountInput);
 
-    if (title.isEmpty || notes.isEmpty || amount <= 0) {
+    if (title.isEmpty || _selectedDate == null || amount <= 0) {
       return;
     } else {
-      widget.addTransactionHandler(title, notes, amount);
+      widget.addTransactionHandler(
+        title,
+        notes,
+        _selectedDate,
+        amount,
+      );
       Navigator.of(context).pop();
     }
+  }
+
+  void _showDatePickerPopUp() {
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2019),
+            lastDate: DateTime.now())
+        .then((pickedDate) {
+      if (pickedDate == null) {
+        return;
+      }
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    });
   }
 
   @override
@@ -38,28 +65,50 @@ class _NewTransactionState extends State<NewTransaction> {
           children: <Widget>[
             TextField(
               decoration: InputDecoration(labelText: 'Title'),
-              controller: titleEditingController,
-              onSubmitted: (_) => submitTransaction,
+              controller: _titleEditingController,
+              onSubmitted: (_) => _submitTransaction,
             ),
             TextField(
               decoration: InputDecoration(labelText: 'Amount'),
-              controller: amountEditingController,
+              controller: _amountEditingController,
               keyboardType: TextInputType.number,
-              onSubmitted: (_) => submitTransaction(),
+              onSubmitted: (_) => _submitTransaction(),
             ),
             TextField(
               decoration: InputDecoration(labelText: 'Detail'),
-              controller: noteEditingController,
-              onSubmitted: (_) => submitTransaction(),
+              controller: _noteEditingController,
+              onSubmitted: (_) => _submitTransaction(),
             ),
-            FlatButton(
-                onPressed: submitTransaction,
-                child: Text(
-                  "Add Transcation",
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
+            Container(
+              height: 70,
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      _selectedDate == null
+                          ? "No date choosen."
+                          : DateFormat.yMMMMd().format(_selectedDate),
+                    ),
                   ),
-                ))
+                  FlatButton(
+                    onPressed: _showDatePickerPopUp,
+                    child: Text(
+                      "Select date",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    textColor: Theme.of(context).primaryColor,
+                  ),
+                ],
+              ),
+            ),
+            RaisedButton(
+              onPressed: _submitTransaction,
+              child: Text("Add Transcation"),
+              textColor: Theme.of(context).textTheme.button.color,
+              color: Theme.of(context).primaryColor,
+            ),
           ],
         ),
       ),
