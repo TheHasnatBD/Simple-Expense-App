@@ -1,13 +1,22 @@
+import 'dart:io';
+
+import 'package:expense_app/widget/adaptive_flat_button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class NewTransaction extends StatefulWidget {
   final Function addTransactionHandler;
 
-  NewTransaction(this.addTransactionHandler);
+  NewTransaction(this.addTransactionHandler) {
+    print('constructor() => NewTransaction Widget');
+  }
 
   @override
-  _NewTransactionState createState() => _NewTransactionState();
+  _NewTransactionState createState() {
+    print('createState() => NewTransaction Widget');
+    return _NewTransactionState();
+  }
 }
 
 class _NewTransactionState extends State<NewTransaction> {
@@ -15,6 +24,28 @@ class _NewTransactionState extends State<NewTransaction> {
   final _noteEditingController = TextEditingController();
   final _amountEditingController = TextEditingController();
   DateTime _selectedDate;
+
+  _NewTransactionState() {
+    print('constructor ==> ==> NewTransaction Widget');
+  }
+
+  @override
+  void initState() {
+    print('initState() => NewTransaction Widget');
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(NewTransaction oldWidget) {
+    print('didUpdateWidget() => NewTransaction Widget');
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    print('dispose() => NewTransaction Widget');
+    super.dispose();
+  }
 
   void _submitTransaction() {
     final title = _titleEditingController.text;
@@ -56,60 +87,66 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            TextField(
-              decoration: InputDecoration(labelText: 'Title'),
-              controller: _titleEditingController,
-              onSubmitted: (_) => _submitTransaction,
-            ),
-            TextField(
-              decoration: InputDecoration(labelText: 'Amount'),
-              controller: _amountEditingController,
-              keyboardType: TextInputType.number,
-              onSubmitted: (_) => _submitTransaction(),
-            ),
-            TextField(
-              decoration: InputDecoration(labelText: 'Detail'),
-              controller: _noteEditingController,
-              onSubmitted: (_) => _submitTransaction(),
-            ),
-            Container(
-              height: 70,
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      _selectedDate == null
-                          ? "No date choosen."
-                          : DateFormat.yMMMMd().format(_selectedDate),
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: _showDatePickerPopUp,
-                    child: Text(
-                      "Select date",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+    final mediaQuery = MediaQuery.of(context);
+
+    return SingleChildScrollView(
+      child: Card(
+        margin: EdgeInsets.all(3),
+        elevation: 5,
+        child: Container(
+          padding: EdgeInsets.only(
+            top: 10,
+            bottom: mediaQuery.viewInsets.bottom + 10,
+            left: 10,
+            right: 10,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(labelText: 'Title'),
+                controller: _titleEditingController,
+                onSubmitted: (_) => _submitTransaction,
+              ),
+              TextField(
+                decoration: InputDecoration(labelText: 'Amount'),
+                controller: _amountEditingController,
+                keyboardType: TextInputType.number,
+                onSubmitted: (_) => _submitTransaction(),
+              ),
+              TextField(
+                decoration: InputDecoration(labelText: 'Detail'),
+                controller: _noteEditingController,
+                onSubmitted: (_) => _submitTransaction(),
+              ),
+              Container(
+                height: 70,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        _selectedDate == null
+                            ? "No date choosen."
+                            : DateFormat.yMMMMd().format(_selectedDate),
                       ),
                     ),
-                    textColor: Theme.of(context).primaryColor,
-                  ),
-                ],
+                    AdaptiveFlatButton("Choose Date", _showDatePickerPopUp),
+                  ],
+                ),
               ),
-            ),
-            RaisedButton(
-              onPressed: _submitTransaction,
-              child: Text("Add Transcation"),
-              textColor: Theme.of(context).textTheme.button.color,
-              color: Theme.of(context).primaryColor,
-            ),
-          ],
+              Platform.isIOS
+                  ? CupertinoButton(
+                      color: Theme.of(context).primaryColor,
+                      child: const Text("Add Transcation"),
+                      onPressed: _submitTransaction)
+                  : RaisedButton(
+                      onPressed: _submitTransaction,
+                      child: const Text("Add Transcation"),
+                      textColor: Theme.of(context).textTheme.button.color,
+                      color: Theme.of(context).primaryColor,
+                    ),
+            ],
+          ),
         ),
       ),
     );
