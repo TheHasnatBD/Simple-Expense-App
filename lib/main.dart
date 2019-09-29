@@ -52,16 +52,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
-  //String titleInput, noteDetailInput, amountInput;
   bool _showChart = false;
-  final List<Transaction> _transactionList = [
-    /*Transaction(
-        id: '1',
-        title: 'Demo title',
-        notes: 'Demo notes',
-        dateTime: DateTime.now(),
-        amount: 23.45),*/
-  ];
+  final List<Transaction> _transactionList = [];
+
   List<Transaction> get _recentTransactions {
     return _transactionList.where((transaction) {
       return transaction.dateTime
